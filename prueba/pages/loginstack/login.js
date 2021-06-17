@@ -1,10 +1,9 @@
 //import liraries
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, StatusBar, TextInput } from 'react-native';
-import { ThemeProvider, useTheme } from '@react-navigation/native';
-// create a component
+import { View, Text, StyleSheet, Button, TextInput } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 const API = 'http://localhost:3000'; // aca la importe, pero la puedes escribir a mano abajo xd
-
+const Stack2 = createStackNavigator();
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -53,10 +52,10 @@ const Login = ({ navigation }) => {
                 onChangeText={(text) => setPassword(text)}
                 placeholder={'Ingrese contraseña'}
             />
-            <Button title='Iniciar Sesion' color='orange' onPress={() => verify()} />
+            <Button title='Iniciar Sesion' color='green' onPress={() => {navigation.navigate("MainStack")}}/*onPress={() => verify()}*/ />
         </View>
     );
-};
+};/*onPress={() => {navigation.navigate("MainStack",{screen:"Soporte"})}}*/ 
 
 // define your styles
 const styles = StyleSheet.create({
