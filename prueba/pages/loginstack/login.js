@@ -1,31 +1,67 @@
 //import liraries
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, TextInput } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Button, ActivityIndicator, TextInput,AppRegistry,StyleSheet,Text, View, TouchableHighlight, AlertIOS, Alert } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { AsyncStorage } from '@react-native-async-storage/async-storage';
+//import { AuthContext } from '../../../components2/context';
 const API = 'http://localhost:3000'; // aca la importe, pero la puedes escribir a mano abajo xd
 const Stack2 = createStackNavigator();
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [userToken, setUserToken] = React.useState(null);
+    /*const authContext = React.useMemo(() => ({
+        signIn: () => {
+            setUserToken('fgkj');
+            setLoading(false);
+        },
+        signOut: () => {
+            setUserToken(null);
+            setLoading(false);
+        },
+        signUp: () => {
+            setUserToken('fgkj');
+            setLoading(false);
+        },
+    }));*/
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        },1000);
+    },[]);
+
+    //const { signIn } = React.useState(authContext);
+
     const verify = async () => {
-    if (!loading) {
-            setLoading(true);
+    if (loading) {
+
+            setLoading(false);
             console.log(username, password);
             fetch(API + '/API-login', { // la ruta de tu api
                 method: 'POST',
                 headers: {
-                    Accept: 'application/json',
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ // aca van lo que pide tu api en body (si no tiene body borra esto)
-                    username: email, //antes de 2 puntos el nombre de la variable de la api después la variable almacenada en el frontend
+                    username: username, //antes de 2 puntos el nombre de la variable de la api después la variable almacenada en el frontend
                     password: password,
+                    //para transformar JSON.parse(string) de string a json
                 }),
             })
                 .then((response) => response.json())
-                .then((json) => {
-                    console.log(json);
+                .then(async (json) => {
+                    if (json.error) { //sesion equivocada
+                        Alert.alert('','');//titulo y descripción
+                    }
+                    else{ //sesión correcta
+                        await AsyncStorage.setItem("token",JSON.stringify(json));//llave y resultado
+                        var line = JSON.parse(await AsyncStorage.getItem("token"));//llave y resultado
+                        //line.rut para acceder
+                        navigation.navigate("Profile");
+                    }
                 })
                 .catch((error) => {
                     console.error(error);
@@ -52,7 +88,7 @@ const Login = ({ navigation }) => {
                 onChangeText={(text) => setPassword(text)}
                 placeholder={'Ingrese contraseña'}
             />
-            <Button title='Iniciar Sesion' color='green' onPress={() => {navigation.navigate("MainStack")}}/*onPress={() => verify()}*/ />
+            <Button title='Iniciar Sesion' color='green' onPress={() => /*{signIn()}}*/{navigation.navigate("MainStack")}}/*onPress={() => verify()}*/ />
         </View>
     );
 };/*onPress={() => {navigation.navigate("MainStack",{screen:"Soporte"})}}*/ 

@@ -11,9 +11,9 @@ const Registro = ({ navigation }) => {
     const [direccion, setdireccion] = useState('');
     const [rut, setrut] = useState('');
     const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const verify = async () => {
-    if (!loading) {
+    if (loading) {
             setLoading(true);
             if(password.length<8){
                 Alert.alert('Error','Contraseña muy corta');

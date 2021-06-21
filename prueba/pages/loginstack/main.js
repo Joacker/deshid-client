@@ -8,7 +8,7 @@ const main = ({navigation}) => {
     return (
         <View style={styles.container}>
             <ImageBackground source={image} style={styles.profileImgContainer}></ImageBackground>
-            <Text>Welcum</Text>
+            <Text>Welcome</Text>
         <Button title='Login' color='orange' onPress={() => {navigation.navigate("Login")}}/>
         <Button title='Register' color='orange' onPress={() => {navigation.navigate("Registro")}}/>
         <Button title='VerInfo' color='orange'/>

@@ -1,13 +1,19 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Button,View, Text, StyleSheet } from 'react-native';
 
 import { BottomTabBarHeightContext,createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // create a component
 const Profile = ({ navigation }) => {
+    const Logout = async() =>{
+        await AsyncStorage.removeItem("token");
+        navigation.navigate("LoginStack");
+    }
     return (
         <View style={styles.container}>
             <Text>MyComponent</Text>
+            <Button title='Cierre de sesión' color='orange' onPress={() => Logout()} />
         </View>
     );
 };
