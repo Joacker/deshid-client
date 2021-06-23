@@ -1,44 +1,24 @@
 //import liraries
-import React, { useState, useEffect, useMemo } from 'react';
-import { Button, ActivityIndicator, TextInput,AppRegistry,StyleSheet,Text, View, TouchableHighlight, AlertIOS, Alert } from 'react-native';
+import React, { useState, useEffect, useMemo,Component, AsyncStorage}  from 'react';
+import { Button, ActivityIndicator, TextInput,AppRegistry,StyleSheet,Text, View, TouchableHighlight, AlertIOS, Alert} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { AsyncStorage } from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
+//import { AsyncStorage } from '@react-native-async-storage/async-storage';
 //import { AuthContext } from '../../../components2/context';
 const API = 'http://localhost:3000'; // aca la importe, pero la puedes escribir a mano abajo xd
 const Stack2 = createStackNavigator();
 const Login = ({ navigation }) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [correo, setcorreo] = useState('');
+    const [contrasena, setContrasena] = useState('');
     const [loading, setLoading] = useState(true);
     const [userToken, setUserToken] = React.useState(null);
-    /*const authContext = React.useMemo(() => ({
-        signIn: () => {
-            setUserToken('fgkj');
-            setLoading(false);
-        },
-        signOut: () => {
-            setUserToken(null);
-            setLoading(false);
-        },
-        signUp: () => {
-            setUserToken('fgkj');
-            setLoading(false);
-        },
-    }));*/
-
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        },1000);
-    },[]);
-
-    //const { signIn } = React.useState(authContext);
-
     const verify = async () => {
+    console.log("1234");
     if (loading) {
 
-            setLoading(false);
-            console.log(username, password);
+            console.log("verify");
+            setLoading(true);
+            //console.log();
             fetch(API + '/API-login', { // la ruta de tu api
                 method: 'POST',
                 headers: {
@@ -46,10 +26,11 @@ const Login = ({ navigation }) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ // aca van lo que pide tu api en body (si no tiene body borra esto)
-                    username: username, //antes de 2 puntos el nombre de la variable de la api después la variable almacenada en el frontend
-                    password: password,
+                    correo: correo, //antes de 2 puntos el nombre de la variable de la api después la variable almacenada en el frontend
+                    contrasena: contrasena
                     //para transformar JSON.parse(string) de string a json
                 }),
+                
             })
                 .then((response) => response.json())
                 .then(async (json) => {
@@ -59,7 +40,7 @@ const Login = ({ navigation }) => {
                     else{ //sesión correcta
                         await AsyncStorage.setItem("token",JSON.stringify(json));//llave y resultado
                         var line = JSON.parse(await AsyncStorage.getItem("token"));//llave y resultado
-                        //line.rut para acceder
+                        console.log(line.correo,line.contrasena); //para acceder
                         navigation.navigate("Profile");
                     }
                 })
@@ -72,23 +53,23 @@ const Login = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <TextInput
-                value={username}
+                value={correo}
                 autoCapitalize="none"
                 autoCompleteType="off"
                 autoCorrect={false}
-                onChangeText={(text) => setUsername(text)}
-                placeholder={'Ingrese nombre de usuario'}
+                onChangeText={(text) => setcorreo(text)}
+                placeholder={'Ingrese correo'}
             />
             <TextInput
-                value={password}
+                value={contrasena}
                 autoCapitalize="none"
                 autoCompleteType="off"
                 autoCorrect={false}
                 secureTextEntry={true}
-                onChangeText={(text) => setPassword(text)}
+                onChangeText={(text) => setContrasena(text)}
                 placeholder={'Ingrese contraseña'}
             />
-            <Button title='Iniciar Sesion' color='green' onPress={() => /*{signIn()}}*/{navigation.navigate("MainStack")}}/*onPress={() => verify()}*/ />
+            <Button title='Iniciar Sesion' color='green' onPress={() => {navigation.navigate("MainStack")}/*verify()*/}/>
         </View>
     );
 };/*onPress={() => {navigation.navigate("MainStack",{screen:"Soporte"})}}*/ 
