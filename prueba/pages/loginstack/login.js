@@ -1,20 +1,20 @@
 //import liraries
-import React, { useState, useEffect, useMemo,Component, AsyncStorage}  from 'react';
+import React, { useState, useEffect, useMemo,Component}  from 'react';
 import { Button, ActivityIndicator, TextInput,AppRegistry,StyleSheet,Text, View, TouchableHighlight, AlertIOS, Alert} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as Notifications from 'expo-notifications';
-//import { AsyncStorage } from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 //import { AuthContext } from '../../../components2/context';
 const API = 'http://localhost:3000'; // aca la importe, pero la puedes escribir a mano abajo xd
 const Stack2 = createStackNavigator();
 const Login = ({ navigation }) => {
     const [correo, setcorreo] = useState('');
     const [contrasena, setContrasena] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [userToken, setUserToken] = React.useState(null);
     const verify = async () => {
     console.log("1234");
-    if (loading) {
+    if (!loading) {
 
             console.log("verify");
             setLoading(true);
@@ -34,18 +34,20 @@ const Login = ({ navigation }) => {
             })
                 .then((response) => response.json())
                 .then(async (json) => {
-                    if (json.error) { //sesion equivocada
-                        Alert.alert('','');//titulo y descripción
+                    console.log(json.token);
+                    if (json.token) { //sesion equivocada
+                        await AsyncStorage.setItem("token",json.token);//llave y resultado
+                        setLoading(false);
+                        navigation.navigate("MainStack");
                     }
                     else{ //sesión correcta
-                        await AsyncStorage.setItem("token",JSON.stringify(json));//llave y resultado
-                        var line = JSON.parse(await AsyncStorage.getItem("token"));//llave y resultado
-                        console.log(line.correo,line.contrasena); //para acceder
-                        navigation.navigate("Profile");
+                        setLoading(false);
+                        Alert.alert('','');//titulo y descripción
                     }
                 })
                 .catch((error) => {
                     console.error(error);
+                    setLoading(false);
                 });
             setLoading(false);
         }
@@ -69,7 +71,7 @@ const Login = ({ navigation }) => {
                 onChangeText={(text) => setContrasena(text)}
                 placeholder={'Ingrese contraseña'}
             />
-            <Button title='Iniciar Sesion' color='green' onPress={() => {navigation.navigate("MainStack")}/*verify()*/}/>
+            <Button title='Iniciar Sesion' color='green' onPress={() => {/*navigation.navigate("MainStack")}*/verify()}}/>
         </View>
     );
 };/*onPress={() => {navigation.navigate("MainStack",{screen:"Soporte"})}}*/ 
