@@ -35,12 +35,12 @@ const Login = ({ navigation }) => {
                 .then((response) => response.json())
                 .then(async (json) => {
                     console.log(json.token);
-                    if (json.token) { //sesion equivocada
+                    if (json.token) { 
                         await AsyncStorage.setItem("token",json.token);//llave y resultado
                         setLoading(false);
                         navigation.navigate("MainStack");
                     }
-                    else{ //sesión correcta
+                    else{ 
                         setLoading(false);
                         Alert.alert('','');//titulo y descripción
                     }

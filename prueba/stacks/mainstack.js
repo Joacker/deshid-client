@@ -14,7 +14,7 @@ const Mainstack = () => {
       showLabel: false,
       style: { 
         position: 'absolute',
-        bottom: 25,
+        bottom: 10,
         left: 30,
         right: 20,
         elevation:0,
@@ -60,7 +60,7 @@ const Mainstack = () => {
                   }}
                   />      
                 <Text style={{color: focused ? '#e32f45' : '#748c94', fontSize: 12}}>
-                  NEWDESHID
+                  DESHID
                   </Text>
                 </View>
               ),
