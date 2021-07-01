@@ -1,4 +1,3 @@
-//import liraries
 import React, { useState, useEffect, useMemo,Component}  from 'react';
 import { Button, ActivityIndicator, TextInput,AppRegistry,StyleSheet,Text, 
 View, SafeAreaView, FlatList, TouchableHighlight, AlertIOS, Alert,TouchableOpacity, Dimensions} from 'react-native';
@@ -20,10 +19,10 @@ const Add = ({ navigation }) => {
         const onChangeText = (text) => {
             setValue(text);
         };
-    const [data,setData] = useState([]); 
+    const [deshid,setDeshid] = useState([]); 
     const [aux,setAux] = useState(true);
     const [tab, setTab] = useState(0);
-    const [modelo, setModelo] = useState("");;
+    const [id, setId] = useState(0);
     const [loading, setLoading] = useState(false);
     //const line = 'bearer '+AsyncStorage.getItem("token");
     const verify2 = async () => {
@@ -32,7 +31,7 @@ const Add = ({ navigation }) => {
             console.log("verify2");
             setLoading(true);
             //console.log();
-            fetch(API + '/API-addDeshid', { // la ruta de tu api
+            fetch(API + '/API-linkDeshid', { // la ruta de tu api
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -40,7 +39,7 @@ const Add = ({ navigation }) => {
                     'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
                 },
                 body: JSON.stringify({ // aca van lo que pide tu api en body (si no tiene body borra esto)
-                    modelo: modelo,
+                    id: id,
                     //para transformar JSON.parse(string) de string a json
                 }),
                 
@@ -66,25 +65,29 @@ const Add = ({ navigation }) => {
         setTab(0);
     };
     const renderItem = ({item}) => {
-            if (item.id) {
                 //contestado
                 return(
                 <View style = {styles.itemg}>
                     <Text>{item.id}</Text>
                 </View>
                 );
-            }else{
-                return(
-                <View style = {styles.itemr}>
-                    <Text>{item.id}</Text>
-                </View>
-                );
-            }
         
         
     };
     /*const onRemove = ({id}) => {
-        setModelo(Modelos.filter(item => item.id !== id));
+        fetch(API + '/API-delDeshid', { // la ruta de tu api
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
+            },
+            body: JSON.stringify({ // aca van lo que pide tu api en body (si no tiene body borra esto)
+                id: item.id,
+                //para transformar JSON.parse(string) de string a json
+            }),
+            
+        })
     };*/
     const verify = async () => {
     if (!loading && aux) {
@@ -103,9 +106,9 @@ const Add = ({ navigation }) => {
             })
             .then((response) => response.json())
             .then(async (json) => {
-                setData(JSON.parse(JSON.stringify(await json)));
+                setDeshid(JSON.parse(JSON.stringify(await json)));
                 //console.log(consultas);
-                console.log(data);
+                console.log(deshid);
                 //loopdata=JSON.parse(JSON.stringify(consultas));
                 //return JSON.stringify(consultas);
             })
@@ -131,13 +134,13 @@ const Add = ({ navigation }) => {
         return(
             <View style={styles.container}>
             <TextInput
-                value={modelo}
+                value={id}
                 autoCapitalize="none"
                 autoCompleteType="off"
                 autoCorrect={false}
                 secureTextEntry={false}
-                onChangeText={(text) => setModelo(text)}
-                placeholder={'Ingrese titulo'}
+                onChangeText={(text) => setId(text)}
+                placeholder={'Ingrese Id_Deshid'}
             />
             <Button title='ADD NEW DESHID' color='blue' onPress={() => {verify2()}}/>
         </View>
@@ -147,7 +150,7 @@ const Add = ({ navigation }) => {
             return (
             <View style={styles.container}>
                 <FlatList 
-                    data = {data}
+                    deshid = {deshid}
                     renderItem = {renderItem}
                     
                 />
