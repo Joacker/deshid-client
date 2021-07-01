@@ -1,11 +1,11 @@
 //import liraries
 import React, { useState, useEffect, useMemo,Component}  from 'react';
 import { Button, ActivityIndicator, TextInput,AppRegistry,StyleSheet,Text, 
-    View, SafeAreaView, FlatList, TouchableHighlight, AlertIOS, Alert,TouchableOpacity, Dimensions} from 'react-native';
-    import { createStackNavigator } from '@react-navigation/stack';
-    import * as Notifications from 'expo-notifications';
-    import AsyncStorage from "@react-native-async-storage/async-storage";
-    import styled from "styled-components";
+View, SafeAreaView, FlatList, TouchableHighlight, AlertIOS, Alert,TouchableOpacity, Dimensions} from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
+import * as Notifications from 'expo-notifications';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import styled from "styled-components";
 import { render } from 'react-native-web';
     // create a component
 var loopdata = [];
