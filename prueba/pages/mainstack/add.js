@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import styled from "styled-components";
 import { render } from 'react-native-web';
 // create a component
-var loopdata = [];
+//var data = [];
 const {aheight, awidth} = Dimensions.get('window');
 var a = awidth*0.9;
 const API = 'http://localhost:3000'; // aca la importe, pero la puedes escribir a mano abajo xd
@@ -64,35 +64,17 @@ const Add = ({ navigation }) => {
     const pass3 = () => {
         setTab(0);
     };
-    const renderItem = ({item}) => {
+    const renderItem = ({item}) => (
                 //contestado
-                return(
-                <View style = {styles.itemg}>
+                <View style = {styles.item}>
                     <Text>{item.id}</Text>
-                </View>
-                );
-        
-        
-    };
-    /*const onRemove = ({id}) => {
-        fetch(API + '/API-delDeshid', { // la ruta de tu api
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
-            },
-            body: JSON.stringify({ // aca van lo que pide tu api en body (si no tiene body borra esto)
-                id: item.id,
-                //para transformar JSON.parse(string) de string a json
-            }),
-            
-        })
-    };*/
+                </View>   
+    );
+ 
     const verify = async () => {
     if (!loading && aux) {
 
-            console.log("verify");
+            console.log("verifyGet");
             setLoading(true);
             //console.log();
             fetch(API + '/API-getDeshid', { // la ruta de tu api
@@ -108,6 +90,8 @@ const Add = ({ navigation }) => {
             .then(async (json) => {
                 setDeshid(JSON.parse(JSON.stringify(await json)));
                 //console.log(consultas);
+                //data=JSON.parse(JSON.stringify(await json));
+                console.log("getJson");
                 console.log(deshid);
                 //loopdata=JSON.parse(JSON.stringify(consultas));
                 //return JSON.stringify(consultas);
@@ -150,7 +134,7 @@ const Add = ({ navigation }) => {
             return (
             <View style={styles.container}>
                 <FlatList 
-                    deshid = {deshid}
+                    data = {deshid}
                     renderItem = {renderItem}
                     
                 />
@@ -172,18 +156,12 @@ const styles = StyleSheet.create({
         justifyContent:"center",
         backgroundColor: '#ffff'
     },
-    itemg: {
+    item: {
         justifyContent:"center",
         padding:5,
         marginVertical:5,
-        backgroundColor:"#caffbf"
+        backgroundColor:"lightgray"
     },
-    itemr: {
-        justifyContent:"center",
-        padding:5,
-        marginVertical:5,
-        backgroundColor:"#ffadad"
-    }
 });
 //make this component available to the app
 export default Add;

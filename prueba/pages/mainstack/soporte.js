@@ -73,18 +73,44 @@ const Soporte = ({ navigation }) => {
                 //contestado
                 return(
                 <View style = {styles.itemg}>
-                    <Text>{item.titulo}</Text>
+                    <View style = {styles.consulta}>
+                        <Text>Titulo: {item.titulo}</Text>
+                        <Text>Descripción: {item.descripcion}</Text>
+                        <Text>Respuesta: {item.respuesta}</Text>
+                    </View>
+                        <Button styles={styles.borrar} title='BORRAR' color='blue' onPress={()=>borrar({item})}/>
                 </View>
                 );
             }else{
                 return(
-                <View style = {styles.itemr}>
-                    <Text>{item.titulo}</Text>
+                    <View style = {styles.itemr}>
+                    <View style = {styles.consulta}>
+                        <Text>Titulo: {item.titulo}</Text>
+                        <Text>Descripción: {item.descripcion}</Text>
+                    </View>
+                        <Button styles={styles.borrar} title='BORRAR' color='blue' onPress={()=>borrar({item})}/>
                 </View>
                 );
             }
         
         
+    };
+    const borrar = async (item) => {
+        const id = item.id;
+        fetch(API + '/API-delConsulta', { // la ruta de tu api
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
+            },
+            body: 
+                JSON.stringify({
+                    id:id
+                })
+                
+            })
+            verify();
     };
     const verify = async () => {
     if (!loading && aux) {
@@ -179,6 +205,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffff'
     },
     itemg: {
+        flex:1,
         justifyContent:"center",
         padding:5,
         marginVertical:5,
@@ -189,6 +216,13 @@ const styles = StyleSheet.create({
         padding:5,
         marginVertical:5,
         backgroundColor:"#ffadad"
+    },
+    consulta: {
+
+    },
+    borrar: {
+        width: 50,
+
     }
 });
 
