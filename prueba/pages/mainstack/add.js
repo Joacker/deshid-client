@@ -9,6 +9,7 @@ import styled from "styled-components";
 import { render } from 'react-native-web';
 const API = 'http://localhost:3000';
 const Add = ({ navigation }) => {
+    const [item, setItem] = useState([]);
     const [alimento, setAlimento] = useState("");
     const [process, setProcess] = useState(false);
     const [estado, setEstado] = useState([]);
@@ -51,6 +52,9 @@ const Add = ({ navigation }) => {
     const pass3 = () => {
         setTab(3);
     };
+    const pass4 = () => {
+        setTab(4);
+    };
     const renderItem = ({item}) => {
                 return(
                 <View style = {styles.itemg}>
@@ -80,7 +84,7 @@ const Add = ({ navigation }) => {
     const ViewData = async (item) => {
         //Mostrar Datos Tiempo Real
         //Botón Historial
-        setAlimento(item.item.alimento);
+        setItem(item.item);
         setProcess(item.item.inProcess);
         console.log("Checking Estado");
         fetch(API + '/API-getDato', { 
@@ -97,13 +101,11 @@ const Add = ({ navigation }) => {
         }).then((response) => response.json(
         )).then(async (json) => { 
             const json1 = await json;
-            console.log(json1);
-            console.log(JSON.stringify(json1));
-            setAlimento(JSON.parse(JSON.stringify(json1))[0].alimento);
-            //setEstado(JSON.parse(JSON.stringify(await json)));
+
+            setEstado(JSON.parse(JSON.stringify(json1))[0]);
             console.log("Entrando");
         }).catch((error) => {console.error(error);});
-        console.log(estado[0]);
+        console.log(estado);
         pass3();
     };
     const DesLink = async (item) => {
@@ -122,6 +124,25 @@ const Add = ({ navigation }) => {
                 
             })
         CheckData();
+    };
+    const StartProcess = async () =>{
+        console.log("Inciando procesos");
+        console.log(item.id);
+        fetch(API + '/API-startProcess', { 
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
+            },
+            body: 
+                JSON.stringify({
+                    id:item.id,
+                    alimento:alimento
+                })
+                
+            })
+            pass2();
     };
     if (aux) {
         setAux(false);
@@ -166,11 +187,12 @@ const Add = ({ navigation }) => {
             
         }
     if (tab == 3) {
+        if (process) {
         return(
             <View style={{alignItems:'center',flex:1,marginTop:100,marginBottom:200,flexDirection:'column'}}>
             <View style = {styles.consulta}>
-                        <Text>Deshidratando? {process}</Text>
-                        <Text>Alimento? {alimento}</Text>
+                        <Text>Alimento? {estado.alimento}</Text>
+                        
             </View>
         <View style={{justifyContent:'center',flex:1,flexDirection:'row',margin:10}}>
         <View style={{
@@ -187,7 +209,7 @@ const Add = ({ navigation }) => {
             fontWeight: 'bold',
             color: 'white',
             fontSize: 15,
-        }}>1</Text>
+        }}>{estado.temperatura}°C</Text>
         </View>
         <View style={{
         width: 140,
@@ -203,7 +225,7 @@ const Add = ({ navigation }) => {
             fontWeight: 'bold',
             color: 'white',
             fontSize: 15,
-        }}>2</Text>
+        }}>{estado.peso}g</Text>
         </View>
         </View>
         <View style={{justifyContent:'center',flex:1,flexDirection:'row',margin:10}}>
@@ -221,7 +243,7 @@ const Add = ({ navigation }) => {
             fontWeight: 'bold',
             color: 'white',
             fontSize: 15,
-        }}>11%</Text>
+        }}>{estado.gas}%</Text>
         </View>
         <View style={{
         width: 140,
@@ -237,12 +259,43 @@ const Add = ({ navigation }) => {
             fontWeight: 'bold',
             color: 'white',
             fontSize: 15,
-        }}>3%</Text>
+        }}>{estado.humedad}%</Text>
         </View>
+        </View>
+        <View style = {styles.consulta}>
+            <Button title='Back' color='blue' onPress={() => pass2()}/>           
         </View>
         </View>
             );
+        }else{
+            return(
+                <View style={{alignItems:'center',flex:1,marginTop:100,marginBottom:200,flexDirection:'column'}}>
+                    <View style = {styles.consulta}>
+                                <Text>Sin captura de datos en este momento</Text>
+                                <Button title='Iniciar Proceso' color='blue' onPress={() => pass4()}/>
+                                <Button title='Back' color='blue' onPress={() => pass2()}/>
+                    </View>
+                </View>
+            );
+        }
     };
+    if (tab == 4) {
+        return (
+            <View style={styles.container}>
+            <TextInput
+                value={alimento}
+                autoCapitalize="none"
+                autoCompleteType="off"
+                autoCorrect={false}
+                secureTextEntry={false}
+                onChangeText={(text) => setAlimento(text)}
+                placeholder={'Ingrese Alimento'}
+            />
+            <Button title=' START PROCESS' color='blue' onPress={() => {StartProcess()}}/>
+            </View>
+            
+            );     
+    }
 };
 
 // define your styles
