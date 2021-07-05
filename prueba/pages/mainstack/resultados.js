@@ -86,24 +86,8 @@ const Resultados = () => {
       }}>3%</Text>
     </View>
     </View>
-    </View>
-  /*return(
-    <TouchableHighlight
-    style = {{
-      borderRadius: 45,
-      width: 45,
-      height: 45,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor:'#f00',
-      alignItems: 'center'
-    }}
-    underlayColor = '#ccc'
-    onPress = { () => alert('Yaay!') }
-    >
-    <Text> Mom, look, I am a circle! </Text>
-   </TouchableHighlight>
-  );*/  )
+    </View> )
+    
     };
 
 // define your styles
