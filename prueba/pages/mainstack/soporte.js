@@ -7,57 +7,36 @@ import * as Notifications from 'expo-notifications';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styled from "styled-components";
 import { render } from 'react-native-web';
-    // create a component
-var loopdata = [];
-const {aheight, awidth} = Dimensions.get('window');
-var a = awidth*0.9;
-const API = 'http://localhost:3000'; // aca la importe, pero la puedes escribir a mano abajo xd
-const Stack2 = createStackNavigator();
+const API = 'http://localhost:3000';
 const Soporte = ({ navigation }) => {
-    //const consultas = [];
-    const [value, setValue] = useState("");
-
-        const onChangeText = (text) => {
-            setValue(text);
-        };
     const [data,setData] = useState([]); 
     const [aux,setAux] = useState(true);
     const [tab, setTab] = useState(0);
     const [titulo, setTitulo] = useState('');
     const [descripción, setDescripcion] = useState('');
-    const [userToken, setUserToken] = React.useState(null);
-    const [loading, setLoading] = useState(false);
-    //const line = 'bearer '+AsyncStorage.getItem("token");
-    const verify2 = async () => {
-        if (!loading) {
-
-            console.log("verify2");
-            setLoading(true);
-            //console.log();
-            fetch(API + '/API-addConsulta', { // la ruta de tu api
+    const AddConsulta = async () => {
+            console.log("Añadiendo Consulta");
+            fetch(API + '/API-addConsulta', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
                 },
-                body: JSON.stringify({ // aca van lo que pide tu api en body (si no tiene body borra esto)
+                body: JSON.stringify({ 
                     titulo: titulo,
                     descripcion: descripción
-                    //para transformar JSON.parse(string) de string a json
                 }),
                 
             })
-                .then((response) => response.json(
-                    setTab(0),
-                    setAux(true)
-                ))
-                .catch((error) => {
-                    console.error(error);
-                    setLoading(false);
-                });
-            setLoading(false);
-        }
+                .then((response) => response.json())
+                    .catch((error) => {
+                        console.error(error);
+                        Alert.alert(Error);
+                        alert(error);
+                    });
+        CheckData();    
+        setTab(0);
     };
     const pass1 = () => {
         setTab(1);
@@ -65,12 +44,11 @@ const Soporte = ({ navigation }) => {
     const pass2 = () => {
         setTab(2);
     };
-    const pass3 = () => {
+    const pass0 = () => {
         setTab(0);
     };
     const renderItem = ({item}) => {
             if (item.estado) {
-                //contestado
                 return(
                 <View style = {styles.itemg}>
                     <View style = {styles.consulta}>
@@ -95,9 +73,23 @@ const Soporte = ({ navigation }) => {
         
         
     };
+    const CheckData = async () => {
+        console.log("Checking Data");
+        fetch(API + '/API-getConsultas', { 
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'bearer '+ await AsyncStorage.getItem("token"),
+            }
+        }).then((response) => response.json(
+        )).then(async (json) => { 
+            setData(JSON.parse(JSON.stringify(await json)));
+        }).catch((error) => {console.error(error);});
+    };
     const borrar = async (item) => {
-        const id = item.id;
-        fetch(API + '/API-delConsulta', { // la ruta de tu api
+        const id = item.item.id;
+        fetch(API + '/API-delConsulta', { 
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -110,41 +102,13 @@ const Soporte = ({ navigation }) => {
                 })
                 
             })
-            verify();
+        CheckData();
     };
-    const verify = async () => {
-    if (!loading && aux) {
-
-            console.log("verify");
-            setLoading(true);
-            //console.log();
-            fetch(API + '/API-getConsultas', { // la ruta de tu api
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
-                }
-                
-            })
-            .then((response) => response.json())
-            .then(async (json) => {
-                setData(JSON.parse(JSON.stringify(await json)));
-                //console.log(consultas);
-                console.log(data);
-                //loopdata=JSON.parse(JSON.stringify(consultas));
-                //return JSON.stringify(consultas);
-            })
-                .catch((error) => {
-                    console.error(error);
-                    setLoading(false);
-                });
-            setLoading(false);
-            setAux(false);
-        }
-    };
+    if (aux) {
+        setAux(false);
+        CheckData();
+    }
     if (tab == 0) {
-        verify();
         return (
             <View style={styles.container}>
                 <Button title='Añadir' color='blue' onPress={() => pass1()}/>
@@ -153,7 +117,6 @@ const Soporte = ({ navigation }) => {
         );
     } 
     if (tab == 1){
-        //console.log(loopdata);
         return(
             <View style={styles.container}>
             <TextInput
@@ -174,7 +137,7 @@ const Soporte = ({ navigation }) => {
                 onChangeText={(text) => setDescripcion(text)}
                 placeholder={'Ingrese descripción'}
             />
-            <Button title='ADD NEW QUERY' color='blue' onPress={() => {verify2()}}/>
+            <Button title='ADD NEW QUERY' color='blue' onPress={() => {AddConsulta()}}/>
         </View>
         );
     }
@@ -186,7 +149,7 @@ const Soporte = ({ navigation }) => {
                     renderItem = {renderItem}
                     
                 />
-                <Button title='Back' color='blue' onPress={() => pass3()}/>
+                <Button title='Back' color='blue' onPress={() => pass0()}/>
             </View>
             
             );
