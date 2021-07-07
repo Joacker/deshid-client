@@ -17,6 +17,7 @@ const Add = ({ navigation }) => {
     const [aux,setAux] = useState(true);
     const [tab, setTab] = useState(0);
     const [id, setId] = useState('');
+    const [datahistorica, setDatahistorica] = useState([]);
     const LinkDeshid = async () => {
             console.log("Vinculando Deshidratador");
             fetch(API + '/API-linkDeshid', {
@@ -55,6 +56,9 @@ const Add = ({ navigation }) => {
     const pass4 = () => {
         setTab(4);
     };
+    const pass5 = () => {
+        setTab(5);
+    };
     const renderItem = ({item}) => {
                 return(
                 <View style = {styles.itemg}>
@@ -62,7 +66,7 @@ const Add = ({ navigation }) => {
                         <Text>ID: {item.id}</Text>
                         <Text>Tipo: {item.tipo}</Text>
                     </View>
-                        <Button styles={styles.borrar} title='VerData' color='purple' onPress={()=>ViewData({item})}/>
+                        <Button styles={styles.borrar} title='VerData' color='purple' onPress={()=>ViewData(item)}/>
                         <Button styles={styles.borrar} title='Desvincular' color='blue' onPress={()=>DesLink({item})}/>
                 </View>
                 );    
@@ -78,15 +82,19 @@ const Add = ({ navigation }) => {
             }
         }).then((response) => response.json(
         )).then(async (json) => { 
-            setData(JSON.parse(JSON.stringify(await json)));
+            const json1 = await json;
+            //console.log(json1);
+            setData(JSON.parse(JSON.stringify(json1)));
         }).catch((error) => {console.error(error);});
     };
     const ViewData = async (item) => {
         //Mostrar Datos Tiempo Real
         //Botón Historial
-        setItem(item.item);
-        setProcess(item.item.inProcess);
+        setItem(item);
+        setProcess(item.inprocess);
         console.log("Checking Estado");
+        console.log(process);
+        console.log(item);
         fetch(API + '/API-getDato', { 
             method: 'POST',
             headers: {
@@ -96,7 +104,7 @@ const Add = ({ navigation }) => {
             },
             body: 
             JSON.stringify({
-                id:item.item.id
+                id:item.id
             }),
         }).then((response) => response.json(
         )).then(async (json) => { 
@@ -104,6 +112,7 @@ const Add = ({ navigation }) => {
 
             setEstado(JSON.parse(JSON.stringify(json1))[0]);
             console.log("Entrando");
+            console.log(json1);
         }).catch((error) => {console.error(error);});
         console.log(estado);
         pass3();
@@ -142,8 +151,54 @@ const Add = ({ navigation }) => {
                 })
                 
             })
+            CheckData();
             pass2();
     };
+    const StopProcess = async () => {
+        console.log("Parando procesos");
+        console.log(item.id);
+        fetch(API + '/API-stopProcess', { 
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
+            },
+            body: 
+                JSON.stringify({
+                    id:item.id
+                })
+                
+            })
+            CheckData();
+            pass2();
+    };
+    const ViewAllDato = async () => {
+        const id = item.id;
+        console.log("Ver Datos Historicos Get All Dato");
+        fetch(API + '/API-getAllDato', { 
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
+            },
+            body: 
+                JSON.stringify({
+                    id:id
+                })
+                
+            }).then((response) => response.json(
+                )).then(async (json) => { 
+                    const json1 = await json;
+        
+                    setDatahistorica(JSON.parse(JSON.stringify(json1))[0]);
+                    console.log("Entrando");
+                    console.log(json1);
+                }).catch((error) => {console.error(error);});
+                console.log(id);
+                pass5();
+    }; 
     if (aux) {
         setAux(false);
         CheckData();
@@ -152,7 +207,7 @@ const Add = ({ navigation }) => {
         return (
             <View style={styles.container}>
                 <Button title='Añadir' color='blue' onPress={() => pass1()}/>
-                <Button title='Ver Historial de Consultas' color='purple' onPress={() => pass2()}/>
+                <Button title='Ver Deshidratadores' color='purple' onPress={() => pass2()}/>
             </View>
         );
     } 
@@ -263,6 +318,8 @@ const Add = ({ navigation }) => {
         </View>
         </View>
         <View style = {styles.consulta}>
+            <Button title=' STOP PROCESS' color='blue' onPress={() => {StopProcess()}}/>
+            <Button title=' VER DATA HISTORICA' color='blue' onPress={() => {ViewAllDato()}}/>
             <Button title='Back' color='blue' onPress={() => pass2()}/>           
         </View>
         </View>
@@ -295,7 +352,22 @@ const Add = ({ navigation }) => {
             </View>
             
             );     
-    }
+    };
+    if (tab == 5) {
+        //stop process
+        console.log("Entrando a tab 5");
+        return (
+            <View style={styles.container}>
+                <FlatList 
+                    data = {data}
+                    renderItem = {renderItem}
+                />
+                <Button title='Back' color='blue' onPress={() => pass0()}/>
+            </View>
+
+            );
+
+    };
 };
 
 // define your styles
