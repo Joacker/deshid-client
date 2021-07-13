@@ -15,8 +15,9 @@ import {
     ContributionGraph,
     StackedBarChart,
   } from 'react-native-chart-kit';
-const API = 'http://localhost:3000';
-const Add = ({ navigation }) => {
+  const API = 'http://localhost:3000';
+  const Add = ({ navigation }) => {
+    var width = Dimensions.get("window").width
     const [deshidratacionesl, setDeshidratacionesl] = useState("");
     const [stats, setStats] = useState([]);
     const [item, setItem] = useState([]);
@@ -494,7 +495,7 @@ const Add = ({ navigation }) => {
         });
         return (
             <ScrollView>
-            <View style={styles.container}> 
+            <View style={{alignItems:'center',flex:1,marginTop:100,marginBottom:200,flexDirection:'column'}}> 
             <Text>Temperatura:</Text>
             <LineChart //     Temperatura
                     data={{
@@ -504,7 +505,7 @@ const Add = ({ navigation }) => {
                             strokeWidth: 2
                         }]
                     }}
-                    width={Dimensions.get("window").width-20} // from react-native
+                    width={width-20} // from react-native
                     height={220}
                     withDots={false}
                     withShadow={false}
@@ -531,7 +532,7 @@ const Add = ({ navigation }) => {
                             strokeWidth: 2
                         }]
                     }}
-                    width={Dimensions.get("window").width-20} // from react-native
+                    width={width-20} // from react-native
                     height={220}
                     withDots={false}
                     withShadow={false}
@@ -558,7 +559,7 @@ const Add = ({ navigation }) => {
                             strokeWidth: 2
                         }]
                     }}
-                    width={Dimensions.get("window").width-20} // from react-native
+                    width={width-20} // from react-native
                     height={220}
                     withDots={false}
                     withShadow={false}
