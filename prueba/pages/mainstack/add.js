@@ -7,8 +7,17 @@ import * as Notifications from 'expo-notifications';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styled from "styled-components";
 import { render } from 'react-native-web';
+import {
+    LineChart,
+    BarChart,
+    PieChart,
+    ProgressChart,
+    ContributionGraph,
+    StackedBarChart,
+  } from 'react-native-chart-kit';
 const API = 'http://localhost:3000';
 const Add = ({ navigation }) => {
+    const [deshidrataciones, setDeshidrataciones] = useState("");
     const [item, setItem] = useState([]);
     const [alimento, setAlimento] = useState("");
     const [process, setProcess] = useState(false);
@@ -42,18 +51,23 @@ const Add = ({ navigation }) => {
         setTab(0);
     };
     const pass0 = () => {
+        CheckData();
         setTab(0);
     };
     const pass1 = () => {
+        CheckData();
         setTab(1);
     };
     const pass2 = () => {
+        CheckData();
         setTab(2);
     };
     const pass3 = () => {
+        CheckData();
         setTab(3);
     };
     const pass4 = () => {
+        CheckData();
         setTab(4);
     };
     const pass5 = () => {
@@ -109,7 +123,6 @@ const Add = ({ navigation }) => {
         }).then((response) => response.json(
         )).then(async (json) => { 
             const json1 = await json;
-
             setEstado(JSON.parse(JSON.stringify(json1))[0]);
             console.log("Entrando");
             console.log(json1);
@@ -176,6 +189,7 @@ const Add = ({ navigation }) => {
     const ViewAllDato = async () => {
         const id = item.id;
         console.log("Ver Datos Historicos Get All Dato");
+        var deshidrataciones2 = [];
         fetch(API + '/API-getAllDato', { 
             method: 'POST',
             headers: {
@@ -191,12 +205,34 @@ const Add = ({ navigation }) => {
             }).then((response) => response.json(
                 )).then(async (json) => { 
                     const json1 = await json;
-        
                     setDatahistorica(JSON.parse(JSON.stringify(json1))[0]);
-                    console.log("Entrando");
-                    console.log(json1);
+                    datahistorica.forEach(element => {
+                        console.log(datahistorica[0]);
+                    });
+                    var first = true;
+                    var aux1 = true;
+                    var i = 0;
+                    var j = 0;
+                    json1.forEach(element => {
+                        if (aux1) {
+                            deshidrataciones2[i]=[];
+                            aux1=false;
+                        }
+                        if (element.peso == "-100") {
+                            aux1 = true;
+                            i = i + 1;
+                            j = 0;
+                        }else{
+                            deshidrataciones2[i][j] = element;
+                            j = j + 1;
+                        }
+                    }
+                    );
+                }).then(()=>{
+
+                    setDeshidrataciones(deshidrataciones.toString());
+                    console.log(deshidrataciones);
                 }).catch((error) => {console.error(error);});
-                console.log(id);
                 pass5();
     }; 
     if (aux) {
@@ -242,7 +278,19 @@ const Add = ({ navigation }) => {
             
         }
     if (tab == 3) {
-        if (process) {
+        if(estado===undefined && process){
+            return(
+                <View style={{alignItems:'center',flex:1,marginTop:100,marginBottom:200,flexDirection:'column'}}>
+                    <View style = {styles.consulta}>
+                        <Text>Esperando Data</Text>
+                        <Button title=' STOP PROCESS' color='blue' onPress={() => {StopProcess()}}/>
+                        <Button title=' VER DATA HISTORICA' color='blue' onPress={() => {ViewAllDato()}}/>
+                        <Button title='Back' color='blue' onPress={() => pass2()}/>
+                    </View>
+                </View>
+            );    
+        }
+        if (process && estado.peso != "-100") {
         return(
             <View style={{alignItems:'center',flex:1,marginTop:100,marginBottom:200,flexDirection:'column'}}>
             <View style = {styles.consulta}>
@@ -324,12 +372,25 @@ const Add = ({ navigation }) => {
         </View>
         </View>
             );
-        }else{
+    }else if(process && estado.peso=="-100"){
+        return(
+            <View style={{alignItems:'center',flex:1,marginTop:100,marginBottom:200,flexDirection:'column'}}>
+                <View style = {styles.consulta}>
+                    <Text>Esperando Data</Text>
+                    <Button title=' STOP PROCESS' color='blue' onPress={() => {StopProcess()}}/>
+                    <Button title=' VER DATA HISTORICA' color='blue' onPress={() => {ViewAllDato()}}/>
+                    <Button title='Back' color='blue' onPress={() => pass2()}/>
+                </View>
+            </View>
+        );
+        
+    }else{
             return(
                 <View style={{alignItems:'center',flex:1,marginTop:100,marginBottom:200,flexDirection:'column'}}>
                     <View style = {styles.consulta}>
                                 <Text>Sin captura de datos en este momento</Text>
                                 <Button title='Iniciar Proceso' color='blue' onPress={() => pass4()}/>
+                                <Button title=' VER DATA HISTORICA' color='blue' onPress={() => {ViewAllDato()}}/>
                                 <Button title='Back' color='blue' onPress={() => pass2()}/>
                     </View>
                 </View>
@@ -357,14 +418,9 @@ const Add = ({ navigation }) => {
         //stop process
         console.log("Entrando a tab 5");
         return (
-            <View style={styles.container}>
-                <FlatList 
-                    data = {data}
-                    renderItem = {renderItem}
-                />
-                <Button title='Back' color='blue' onPress={() => pass0()}/>
-            </View>
-
+                <View>
+                    <Text>Por ahora nada</Text>
+                </View>          
             );
 
     };

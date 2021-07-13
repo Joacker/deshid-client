@@ -38,14 +38,17 @@ const Soporte = ({ navigation }) => {
         CheckData();    
         setTab(0);
     };
+    const pass0 = () => {
+        CheckData();
+        setTab(0);
+    };
     const pass1 = () => {
+        CheckData();
         setTab(1);
     };
     const pass2 = () => {
+        CheckData();
         setTab(2);
-    };
-    const pass0 = () => {
-        setTab(0);
     };
     const renderItem = ({item}) => {
             if (item.estado) {
