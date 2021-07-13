@@ -85,6 +85,18 @@ const Add = ({ navigation }) => {
                 </View>
                 );    
     };
+    const renderItem2 = ({item}) => {
+                return(
+                <View style = {styles.itemg}>
+                    <View style = {styles.consulta}>
+                        <Text>Alimento: {item['0'].alimento}</Text>
+                        <Text>Tiempo de inicio: {item['0'].tiempo}</Text>
+                    </View>
+                        <Button styles={styles.borrar} title='VerData' color='purple' onPress={()=>ViewData(item)}/>
+                        <Button styles={styles.borrar} title='Desvincular' color='blue' onPress={()=>DesLink({item})}/>
+                </View>
+                );    
+    };
     const CheckData = async () => {
         console.log("Checking Deshids");
         fetch(API + '/API-getDeshid', { 
@@ -188,8 +200,7 @@ const Add = ({ navigation }) => {
     };
     const ViewAllDato = async () => {
         const id = item.id;
-        console.log("Ver Datos Historicos Get All Dato");
-        var deshidrataciones2 = [];
+        const deshidrataciones2 = [];
         fetch(API + '/API-getAllDato', { 
             method: 'POST',
             headers: {
@@ -205,11 +216,6 @@ const Add = ({ navigation }) => {
             }).then((response) => response.json(
                 )).then(async (json) => { 
                     const json1 = await json;
-                    setDatahistorica(JSON.parse(JSON.stringify(json1))[0]);
-                    datahistorica.forEach(element => {
-                        console.log(datahistorica[0]);
-                    });
-                    var first = true;
                     var aux1 = true;
                     var i = 0;
                     var j = 0;
@@ -228,12 +234,10 @@ const Add = ({ navigation }) => {
                         }
                     }
                     );
-                }).then(()=>{
-
-                    setDeshidrataciones(deshidrataciones.toString());
-                    console.log(deshidrataciones);
+                    setDeshidrataciones(deshidrataciones2);
+                    console.log(deshidrataciones2)
                 }).catch((error) => {console.error(error);});
-                pass5();
+        pass5();
     }; 
     if (aux) {
         setAux(false);
@@ -418,10 +422,15 @@ const Add = ({ navigation }) => {
         //stop process
         console.log("Entrando a tab 5");
         return (
-                <View>
-                    <Text>Por ahora nada</Text>
-                </View>          
-            );
+            <View style={styles.container}>
+                <FlatList 
+                    data = {deshidrataciones}
+                    renderItem = {renderItem2}
+                    
+                />
+                <Button title='Back' color='blue' onPress={() => pass3()}/>
+            </View>    
+        );
 
     };
 };
