@@ -90,7 +90,7 @@ const Add = ({ navigation }) => {
                 <View style = {styles.itemg}>
                     <View style = {styles.consulta}>
                         <Text>Alimento: {item['0'].alimento}</Text>
-                        <Text>Tiempo de inicio: {item['0'].tiempo}</Text>
+                        <Text>Tiempo de inicio: {Date(item['0'].tiempo)}</Text>
                     </View>
                         <Button styles={styles.borrar} title='VerData' color='purple' onPress={()=>ViewData(item)}/>
                         <Button styles={styles.borrar} title='Desvincular' color='blue' onPress={()=>DesLink({item})}/>
