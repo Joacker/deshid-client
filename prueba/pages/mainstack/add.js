@@ -1,6 +1,6 @@
 //import liraries
 import React, { useState, useEffect, useMemo,Component}  from 'react';
-import { Button, ActivityIndicator, TextInput,AppRegistry,StyleSheet,Text, 
+import { Button, ScrollView, ActivityIndicator, TextInput,AppRegistry,StyleSheet,Text, 
 View, SafeAreaView, FlatList, TouchableHighlight, AlertIOS, Alert,TouchableOpacity, Dimensions} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as Notifications from 'expo-notifications';
@@ -17,7 +17,8 @@ import {
   } from 'react-native-chart-kit';
 const API = 'http://localhost:3000';
 const Add = ({ navigation }) => {
-    const [deshidrataciones, setDeshidrataciones] = useState("");
+    const [deshidratacionesl, setDeshidratacionesl] = useState("");
+    const [stats, setStats] = useState([]);
     const [item, setItem] = useState([]);
     const [alimento, setAlimento] = useState("");
     const [process, setProcess] = useState(false);
@@ -26,7 +27,6 @@ const Add = ({ navigation }) => {
     const [aux,setAux] = useState(true);
     const [tab, setTab] = useState(0);
     const [id, setId] = useState('');
-    const [datahistorica, setDatahistorica] = useState([]);
     const LinkDeshid = async () => {
             console.log("Vinculando Deshidratador");
             fetch(API + '/API-linkDeshid', {
@@ -73,6 +73,9 @@ const Add = ({ navigation }) => {
     const pass5 = () => {
         setTab(5);
     };
+    const pass6 = () => {
+        setTab(6);
+    };
     const renderItem = ({item}) => {
                 return(
                 <View style = {styles.itemg}>
@@ -86,16 +89,15 @@ const Add = ({ navigation }) => {
                 );    
     };
     const renderItem2 = ({item}) => {
-                return(
-                <View style = {styles.itemg}>
-                    <View style = {styles.consulta}>
-                        <Text>Alimento: {item['0'].alimento}</Text>
-                        <Text>Tiempo de inicio: {Date(item['0'].tiempo)}</Text>
-                    </View>
-                        <Button styles={styles.borrar} title='VerData' color='purple' onPress={()=>ViewData(item)}/>
-                        <Button styles={styles.borrar} title='Desvincular' color='blue' onPress={()=>DesLink({item})}/>
-                </View>
-                );    
+        return(
+        <View style = {styles.itemg}>
+            <View style = {styles.consulta}>
+                <Text>Alimento: {item.alimento}</Text>
+                <Text>Tiempo de inicio: {new Date(item.tiempo*1000).toLocaleString()}</Text>
+            </View>
+                <Button styles={styles.borrar} title='Ver estadisticas' color='purple' onPress={()=>ViewStads(item.tiempo)}/>
+        </View>
+        );    
     };
     const CheckData = async () => {
         console.log("Checking Deshids");
@@ -158,6 +160,7 @@ const Add = ({ navigation }) => {
                 
             })
         CheckData();
+        pass2();
     };
     const StartProcess = async () =>{
         console.log("Inciando procesos");
@@ -177,7 +180,6 @@ const Add = ({ navigation }) => {
                 
             })
             CheckData();
-            pass2();
     };
     const StopProcess = async () => {
         console.log("Parando procesos");
@@ -201,6 +203,7 @@ const Add = ({ navigation }) => {
     const ViewAllDato = async () => {
         const id = item.id;
         const deshidrataciones2 = [];
+        const deshidrataciones3 = [];
         fetch(API + '/API-getAllDato', { 
             method: 'POST',
             headers: {
@@ -221,6 +224,9 @@ const Add = ({ navigation }) => {
                     var j = 0;
                     json1.forEach(element => {
                         if (aux1) {
+                            deshidrataciones3[i]=element;
+                            console.log('-----');
+                            console.log(element);
                             deshidrataciones2[i]=[];
                             aux1=false;
                         }
@@ -234,10 +240,49 @@ const Add = ({ navigation }) => {
                         }
                     }
                     );
-                    setDeshidrataciones(deshidrataciones2);
+                    setDeshidratacionesl(deshidrataciones3);
                     console.log(deshidrataciones2)
                 }).catch((error) => {console.error(error);});
         pass5();
+    }; 
+    const ViewStads = async (time) => {
+        const id = item.id;
+        const deshidrataciones3 = [];
+        fetch(API + '/API-getAllDato', { 
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'bearer '+await AsyncStorage.getItem("token"),
+            },
+            body: 
+                JSON.stringify({
+                    id:id
+                })
+                
+            }).then((response) => response.json(
+                )).then(async (json) => { 
+                    const json1 = await json;
+                    var aux1 = false;
+                    var i = 0;
+                    var j = 0;
+                    json1.forEach(element => {
+                        if (element.tiempo == time){
+                            aux1 = true;
+                        }
+                        if (element.peso == "-100"){
+                            aux1 = false;
+                        }
+                        if (aux1){
+                            deshidrataciones3[i]=element;
+                            i = i + 1;
+                        }
+                        
+                    }
+                    );
+                    setStats(deshidrataciones3);
+                }).catch((error) => {console.error(error);});
+        pass6();
     }; 
     if (aux) {
         setAux(false);
@@ -298,7 +343,7 @@ const Add = ({ navigation }) => {
         return(
             <View style={{alignItems:'center',flex:1,marginTop:100,marginBottom:200,flexDirection:'column'}}>
             <View style = {styles.consulta}>
-                        <Text>Alimento? {estado.alimento}</Text>
+                        <Text>Alimento: {estado.alimento}</Text>
                         
             </View>
         <View style={{justifyContent:'center',flex:1,flexDirection:'row',margin:10}}>
@@ -424,14 +469,118 @@ const Add = ({ navigation }) => {
         return (
             <View style={styles.container}>
                 <FlatList 
-                    data = {deshidrataciones}
+                    data = {deshidratacionesl}
                     renderItem = {renderItem2}
                     
                 />
                 <Button title='Back' color='blue' onPress={() => pass3()}/>
             </View>    
         );
-
+    };
+    if (tab == 6) {
+        //stop process
+        console.log("Entrando a tab 6");
+        var tiems = [];
+        var temps = [];
+        var humes = [];
+        var pesos = [];
+        var i = 0
+        stats.forEach(element => {
+            console.log(i);
+            tiems[i] = parseInt(element.tiempo);
+            temps[i] = parseInt(element.temperatura);
+            humes[i] = parseInt(element.humedad);
+            pesos[i] = parseInt(element.peso);
+            i = i + 1;
+        });
+        return (
+            <ScrollView>
+            <View style={styles.container}> 
+            <Text>Temperatura:</Text>
+            <LineChart //     Temperatura
+                    data={{
+                        labels: [new Date(tiems[0]*1000).toLocaleString(),'',new Date(tiems[tiems.length - 1]*1000).toLocaleString()],
+                        datasets: [{
+                            data: temps,
+                            strokeWidth: 2
+                        }]
+                    }}
+                    width={Dimensions.get("window").width-20} // from react-native
+                    height={220}
+                    withDots={false}
+                    withShadow={false}
+                    withInnerLines={false}
+                    withOuterLines={true}
+                    //fromZero={true}
+                    segments={5}
+                    formatYLabel = {(yValue) => {
+                        return yValue + ' [°C]';
+                    }}
+                    chartConfig={{
+                        backgroundColor: '#ffffff',
+                        backgroundGradientFrom: '#ffffff',
+                        backgroundGradientTo: '#bfbfbf',
+                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`
+                    }}
+                    />
+            <Text>Humedad:</Text>
+            <LineChart //     humedad
+                    data={{
+                        labels: [new Date(tiems[0]*1000).toLocaleString(),'',new Date(tiems[tiems.length - 1]*1000).toLocaleString()],
+                        datasets: [{
+                            data: humes,
+                            strokeWidth: 2
+                        }]
+                    }}
+                    width={Dimensions.get("window").width-20} // from react-native
+                    height={220}
+                    withDots={false}
+                    withShadow={false}
+                    withInnerLines={false}
+                    withOuterLines={true}
+                    //fromZero={true}
+                    segments={5}
+                    formatYLabel = {(yValue) => {
+                        return yValue + ' [%]';
+                    }}
+                    chartConfig={{
+                        backgroundColor: '#ffffff',
+                        backgroundGradientFrom: '#ffffff',
+                        backgroundGradientTo: '#bfbfbf',
+                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`
+                    }}
+                    />
+                    <Text>Peso:</Text>
+            <LineChart //     peso
+                    data={{
+                        labels: [new Date(tiems[0]*1000).toLocaleString(),'',new Date(tiems[tiems.length - 1]*1000).toLocaleString()],
+                        datasets: [{
+                            data: pesos,
+                            strokeWidth: 2
+                        }]
+                    }}
+                    width={Dimensions.get("window").width-20} // from react-native
+                    height={220}
+                    withDots={false}
+                    withShadow={false}
+                    withInnerLines={false}
+                    withOuterLines={true}
+                    //fromZero={true}
+                    segments={5}
+                    formatYLabel = {(yValue) => {
+                        return yValue + ' [g]';
+                    }}
+                    chartConfig={{
+                        backgroundColor: '#ffffff',
+                        backgroundGradientFrom: '#ffffff',
+                        backgroundGradientTo: '#bfbfbf',
+                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`
+                    }}
+                    />
+                <Button title='Back' color='blue' onPress={() => pass3()}/>
+            </View>
+            </ScrollView>
+        );
     };
 };
 
