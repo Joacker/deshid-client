@@ -486,7 +486,6 @@ const Add = ({ navigation }) => {
         var pesos = [];
         var i = 0
         stats.forEach(element => {
-            console.log(i);
             tiems[i] = parseInt(element.tiempo);
             temps[i] = parseInt(element.temperatura);
             humes[i] = parseInt(element.humedad);
