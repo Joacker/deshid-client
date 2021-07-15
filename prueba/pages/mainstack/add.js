@@ -181,6 +181,7 @@ import {
                 
             })
             CheckData();
+            pass3()
     };
     const StopProcess = async () => {
         console.log("Parando procesos");
